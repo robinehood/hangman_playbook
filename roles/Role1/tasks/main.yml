@@ -1,26 +1,17 @@
+- name: check container
+  docker_container:
+    name: tomcat
+    image: tomcat
+    state: present
 
-- hosts: ec2-user
-  sudo: yes
-  vars:
-    start_containers_count: 5
-  tasks:
-  - name: run tomcat servers
-    docker: image=ec2-user@34.232.107.102 command="service tomcat7 start" ports=8010 count={{start_containers_count}}
-  - name: Display IP address and port mappings for containers
-    debug: msg="{{inventory_hostname}}:{{docker_containers[{{item}}]['HostConfig']['PortBindings']['8010/tcp'][0]['HostPort']}}"
-    with_sequence: start=0 end={{start_containers_count - 1}}
+- name: remove container
+  docker_container:
+    name: tomcat
+    image: tomcat
+    state: absent
 
-- hosts: ec2-user
-  sudo: yes
-  tasks:
-  - name: stop tomcat servers
-    docker: image=ec2-user@34.232.107.102 command="service tomcat6 start" state=absent
-  - name: Display return codes from stopped containers
-    debug: msg="Returned {{inventory_hostname}}:{{item}}"
-    with_items: docker_containers
-
-- hosts: ec2-user
-  sudo: yes
-  tasks:
-  - name: run tomcat server
-    docker: image=ec2-user@34.232.107.102 name=tomcat command="service tomcat7 start" ports=8010
+- name: create container
+  docker_container:
+    name: tomcat
+    image: tomcat
+    ports: 8010
